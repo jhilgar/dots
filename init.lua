@@ -2,6 +2,7 @@ vim.pack.add{
     { src = 'https://github.com/catppuccin/nvim' },
     { src = 'https://github.com/neovim/nvim-lspconfig' },
     { src = 'https://github.com/ibhagwan/fzf-lua' },
+    { src = 'https://github.com/akinsho/bufferline.nvim' },
 }
 
 vim.g.mapleader = " "
@@ -20,7 +21,19 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
+require("bufferline").setup{
+  options = {
+      mode = "buffers",
+      diagnostics = "nvim_lsp",
+      separator_style = "slant",
+      show_buffer_close_icons = true,
+      show_close_icon = false,
+  }
+}
 
+vim.keymap.set('n', '<leader>bp', '<cmd>BufferLinePick<CR>', { desc = 'pick buffer' })
+vim.keymap.set('n', '<S-h>', '<cmd>BufferLineCyclePrev<CR>', { desc = 'prev buffer' })
+vim.keymap.set('n', '<S-l>', '<cmd>BufferLineCycleNext<CR>', { desc = 'next buffer' })
 
 vim.cmd("colorscheme catppuccin-macchiato")
 
@@ -31,16 +44,6 @@ vim.diagnostic.config{
     update_in_insert = false,
 }
 
-vim.lsp.config('basedpyright', {
-    settings = {
-        basedpyright = {
-            typeCheckingMode = "basic",
-        },
-    },
-})
-vim.lsp.enable('basedpyright')
-
-vim.lsp.enable('ruff')
 vim.api.nvim_create_autocmd('LspAttach', {
     group = vim.api.nvim_create_augroup('UserLspConfig', {}),
     callback = function(ev)
@@ -48,3 +51,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set('n', '<leader>fm', vim.lsp.buf.format, bufopts)
     end,
 })
+vim.lsp.enable('ruff')
+
+vim.lsp.config('ty', {
+    cmd = { 'ty', 'server' },
+    filetypes = { 'python' },
+    root_markers = { 'pyproject.toml', 'ty.toml', '.git' },
+})
+vim.lsp.enable('ty')
